@@ -1,0 +1,16 @@
+{
+  "name": "j12will12-gmail",
+  "owner": {
+    "name": "James Willis",
+    "email": "j12will12@gmail.com",
+    "url": "https://github.com/j12will12-gmail"
+  },
+  "description": "Claude Code plugins by James Willis",
+  "plugins": [
+    {
+      "name": "model-relay",
+      "source": ".",
+      "description": "Switch Claude Code between Anthropic's models and OpenRouter models from a dropdown above the prompt, and search OpenRouter's catalog by name, id or type."
+    }
+  ]
+}
