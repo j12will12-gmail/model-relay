@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { AddedModel, SearchResult, SwitchChoice, SwitchState } from '../types'
-import { asText, canUseTools, catalogUrl, parseCatalog, plan, select, summary, wordsOf } from './catalog'
+import { asText, canUseTools, catalogUrl, fromProvider, parseCatalog, plan, select, summary, wordsOf } from './catalog'
 import type { Settings } from './switching'
 import { asAdded, asLastModel, BUILT_IN, formatSettings, isBuiltIn, parseSettings, stateFrom, withAnthropic, withModel } from './switching'
 
@@ -18,6 +18,7 @@ const COMMANDS: Record<string, { to: string; description: string }> = {
   switchfree: { to: 'free', description: "Switch new sessions to OpenRouter's free router (openrouter/free)" },
   switchcoder: { to: 'coder', description: 'Switch new sessions to Nemotron 3 Ultra, a free coding model' },
   switchqwen: { to: 'qwen', description: 'Switch new sessions to Qwen3 Coder (paid, billed to your OpenRouter key)' },
+  switchgpt: { to: 'gpt', description: 'Switch new sessions to GPT-6.1 Terra, an OpenAI model (paid, through OpenRouter)' },
   claudemode: { to: 'status', description: 'Show which model new sessions will use' },
 }
 
@@ -34,6 +35,8 @@ const NEW_SESSION = 'Start a new session to use it.'
 const NO_KEY =
   'Set your OpenRouter API key first: run /plugin configure model-relay@j12will12-gmail. Get a key at https://openrouter.ai/settings/keys.'
 const SEARCH_TIMEOUT_MS = 25000
+// What the panel says it is looking for while the OpenAI button's list loads.
+const OPENAI_LIST = 'OpenAI models'
 
 // Each search's number. Stop, Done or a newer search moves it on, and a search whose number is no
 // longer current has its result thrown away when it arrives.
@@ -98,6 +101,11 @@ async function search($: EngineInterface, text: string, limit = 10): Promise<Sea
   }
 
   return { title: found.title, hits: found.hits }
+}
+
+// The panel's OpenAI button: OpenAI's models, without typing a search.
+async function openAiModels($: EngineInterface): Promise<SearchResult> {
+  return fromProvider(await fetchCatalog($), 'openai', 'OpenAI', 10)
 }
 
 function labelOf(state: SwitchState) {
@@ -232,11 +240,11 @@ async function removeModel($: EngineInterface, id: string) {
 
 type Outcome = { result: SearchResult } | { error: string } | { timedOut: true }
 
-// Searches OpenRouter, giving up after SEARCH_TIMEOUT_MS.
-function searchWithLimit($: EngineInterface, text: string) {
+// Runs one look at OpenRouter's catalog, giving up after SEARCH_TIMEOUT_MS.
+function searchWithLimit($: EngineInterface, look: () => Promise<SearchResult>) {
   return new Promise<Outcome>(resolve => {
     const timer = $.clock.after(SEARCH_TIMEOUT_MS, () => resolve({ timedOut: true }))
-    search($, text).then(
+    look().then(
       result => {
         timer.cancel()
         resolve({ result })
@@ -249,8 +257,9 @@ function searchWithLimit($: EngineInterface, text: string) {
   })
 }
 
-// The search box: a name, a model id, a type such as coding, or a mix.
-async function find($: EngineInterface, text: string) {
+// The search box: a name, a model id, a type such as coding, or a mix. The OpenAI button gives
+// its own `look`; `text` is then only what the panel says it is looking for.
+async function find($: EngineInterface, text: string, look = () => search($, text)) {
   const query = text.trim()
   if (query === '') {
     return
@@ -258,7 +267,7 @@ async function find($: EngineInterface, text: string) {
   const run = ++searchRun
   await update($, searching, () => query)
   await update($, note, () => '')
-  const outcome = await searchWithLimit($, query)
+  const outcome = await searchWithLimit($, look)
   if (run !== searchRun) {
     return // stopped, or a newer search took over
   }
@@ -433,6 +442,7 @@ export const register: Register = (on, options) => {
             autoFocus
             onSubmit={value => act($, () => find($, value))}
           />
+          <Button key="openai" label="Show OpenAI models" onPress={() => act($, () => find($, OPENAI_LIST, () => openAiModels($)))} />
           {searchingFor !== null && (
             <Box flexDirection="row" columnGap={1}>
               <Text dimColor>Searching OpenRouter for "{searchingFor}"...</Text>

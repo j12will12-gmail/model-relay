@@ -24,6 +24,7 @@ export const BUILT_IN: Record<string, [string, string, string]> = {
   free: ['openrouter/free', 'OpenRouter free router', "OpenRouter's free router (a different free model each request)"],
   coder: ['nvidia/nemotron-3-ultra-550b-a55b:free', 'Nemotron 3 Ultra (free coder)', 'NVIDIA Nemotron 3 Ultra, a free coding model'],
   qwen: ['qwen/qwen3-coder', 'Qwen3 Coder (paid)', 'Qwen3 Coder, paid (about $0.30 in / $1.00 out per million tokens)'],
+  gpt: ['openai/gpt-6.1-terra', 'GPT-6.1 Terra (OpenAI, paid)', 'OpenAI GPT-6.1 Terra, paid (about $1.00 in / $5.00 out per million tokens)'],
 }
 export const isBuiltIn = (model: string) => Object.values(BUILT_IN).some(([id]) => id === model.toLowerCase())
 

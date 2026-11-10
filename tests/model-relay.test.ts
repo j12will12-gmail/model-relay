@@ -20,6 +20,10 @@ const CATALOG = [
   model('meta-llama/llama-5-70b', 'Meta: Llama 5 70B', '0.0000001', '0.0000003', ['tools'], true),
   model('acme/no-tools', 'Acme: No Tools', '0', '0', ['temperature']),
   model('qwen/qwen3-coder', 'Qwen: Qwen3 Coder 480B A35B', '0.0000003', '0.000001', ['tools']),
+  model('openai/gpt-6.1-terra', 'OpenAI: GPT-6.1 Terra', '0.000001', '0.000005', ['tools']),
+  model('openai/gpt-6.1-terra:batch', 'OpenAI: GPT-6.1 Terra', '0.0000005', '0.0000025', ['tools']),
+  model('openai/gpt-6-luna', 'OpenAI: GPT-6 Luna', '0.0000001', '0.0000005', ['tools']),
+  model('openai/text-embed-4', 'OpenAI: Text Embed 4', '0.0000001', '0', ['temperature']),
   // A router that picks a model per request: OpenRouter lists its price as -1.
   model('openrouter/auto', 'Auto Router', '-1', '-1', ['tools']),
 ]
@@ -102,7 +106,7 @@ const typed = (command: string, args = '') => ({
 const BAND = {
   plugin: 'model-relay',
   component: 'AbovePrompt',
-  props: { hasSurvey: false, isWorking: false, maxRows: 20, bodyColumns: 120, scroll: { offset: 0, bodyRows: 20 }, view: {} },
+  props: { hasSurvey: false, isCollapsed: false, isWorking: false, maxRows: 20, bodyColumns: 120, scroll: { offset: 0, bodyRows: 20 }, view: {} },
 } as const
 const OPENROUTER_QWEN = {
   env: {
@@ -332,7 +336,7 @@ test('the slash commands switch, search, add and remove', KEY, async ($, on) => 
   const w = world(on, { settings: {} })
   await $.session.start(START)
   expect(w.commands).toEqual([
-    'switchback', 'switchopenrouter', 'switchfree', 'switchcoder', 'switchqwen', 'claudemode',
+    'switchback', 'switchopenrouter', 'switchfree', 'switchcoder', 'switchqwen', 'switchgpt', 'claudemode',
     'addmodel', 'findmodel', 'removemodel', 'switchmodel',
   ])
 
@@ -356,6 +360,34 @@ test('the slash commands switch, search, add and remove', KEY, async ($, on) => 
   await $.command.run(typed('addmodel'))
   const ui = await $.ui.mount({ ...BAND, surface: 'terminal' })
   expect(await ui.find({ key: 'search' })).toBeDefined()
+  await ui.unmount()
+})
+
+test('an OpenAI model is built in, and the OpenAI button lists the rest without their batch variants', KEY, async ($, on) => {
+  mock.clock(on)
+  const w = world(on, { settings: {} })
+  await $.session.start(START)
+  expect((await $.command.run(typed('switchgpt')))?.text).toMatch(/Switched to GPT-6\.1 Terra \(OpenAI, paid\)/)
+  // OpenAI models go through OpenRouter like any other: same base URL, same key.
+  expect(w.read().env?.ANTHROPIC_BASE_URL).toBe('https://openrouter.ai/api')
+  expect(w.read().env?.ANTHROPIC_AUTH_TOKEN).toBe('sk-or-test')
+  expect(w.read().env?.CLAUDE_CODE_SUBAGENT_MODEL).toBe('openai/gpt-6.1-terra')
+
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  expect((await ui.find({ key: 'model' }))?.props.value).toBe('gpt')
+  await ui.press({ key: 'manage' })
+  await ui.press({ key: 'openai' })
+  expect(await ui.find({ type: 'Text', text: /OpenAI's models on OpenRouter, newest first/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /openai\/gpt-6\.1-terra / })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /:batch/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /Text Embed/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /DeepSeek/ })).toBeUndefined()
+  expect(await ui.find({ key: 'add-2' })).toBeUndefined()
+
+  await ui.press({ key: 'add-1' })
+  expect(await ui.find({ type: 'Text', text: /Added OpenAI: GPT-6 Luna \(paid\) \(openai\/gpt-6-luna\)/ })).toBeDefined()
+  await ui.select({ key: 'model', value: 'openai/gpt-6-luna' })
+  expect(w.read().env?.ANTHROPIC_MODEL).toBe('openai/gpt-6-luna')
   await ui.unmount()
 })
 

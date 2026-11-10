@@ -116,6 +116,17 @@ export function select(catalog: Model[], p: Plan, limit: number): SearchResult &
   return { title, hits, typed: kinds.length > 0 }
 }
 
+// One provider's models (ids that start "openai/"), in OpenRouter's order (newest first). Its
+// ":batch" variants are left out so each model is listed once; they can still be added by id.
+export function fromProvider(catalog: Model[], provider: string, name: string, limit: number): SearchResult {
+  const hits = catalog
+    .filter(m => m.id.startsWith(`${provider}/`) && !m.id.endsWith(':batch') && canUseTools(m))
+    .slice(0, limit)
+    .map(m => summary(m))
+
+  return { title: `${name}'s models on OpenRouter, newest first`, hits }
+}
+
 // Search results as text, for the slash commands.
 export function asText(result: SearchResult, query: string) {
   if (result.hits.length === 0) {

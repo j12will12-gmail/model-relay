@@ -2,7 +2,7 @@
 
 **Switch Claude Code between Anthropic's Claude models and OpenRouter models from a dropdown, right above the prompt.**
 
-Version 1.0.2 · MIT license · A Claude Code plugin by James Willis
+Version 1.1.0 · MIT license · A Claude Code plugin by James Willis
 
 Model-Relay lets you choose which model your **new** Claude Code sessions use: Anthropic's Claude models on your normal Claude login, or any model on [OpenRouter](https://openrouter.ai), free or paid. Search OpenRouter's catalog by name, model id or type (such as "coding"), add the models you like to the dropdown, and always see which one is active in the status line.
 
@@ -100,8 +100,10 @@ model.
   - OpenRouter's free router (`openrouter/free`), which picks a different free model for each request
   - Nemotron 3 Ultra, a free coding model (`nvidia/nemotron-3-ultra-550b-a55b:free`)
   - Qwen3 Coder, a paid model (`qwen/qwen3-coder`)
+  - GPT-6.1 Terra, a paid OpenAI model (`openai/gpt-6.1-terra`)
   - any OpenRouter models you add
 - **A search box** for OpenRouter's catalog. Search by name, model id, type (such as `coding`), or a mix (such as `free coding`).
+- **A [ Show OpenAI models ] button** that lists OpenAI's current models, ready to add. See [Use OpenAI models](#use-openai-models).
 - **The active model in the status line**, for example `Model: Qwen3 Coder (paid)`.
 - **Slash commands** for everything in the dropdown.
 
@@ -129,6 +131,7 @@ Click **[ Add or remove models ]** (or pick **+ Add or remove OpenRouter models.
 ```
 Add an OpenRouter model (only models that can use tools are listed)
 Search: name, model id, or type (e.g. deepseek, qwen/qwen3-coder, coding)
+[ Show OpenAI models ]
 ```
 
 Type and press **Enter**:
@@ -153,6 +156,25 @@ While a search runs, **[ Stop ]** ends it. A search also gives up by itself afte
 
 In the same panel, the models you added are listed under **Models you added**, each with a **[ Remove ]** button. **[ Done ]** closes the panel.
 
+### Use OpenAI models
+
+OpenAI's models are on OpenRouter, so Model-Relay switches to them like any other OpenRouter model, with the OpenRouter key from [Quick start](#quick-start) step 1. Claude Code can't call OpenAI's own API directly, because it speaks a different format, so there is no OpenAI key to give Model-Relay.
+
+- **GPT-6.1 Terra** is in the dropdown from the start. Pick it there, or type `/switchgpt`.
+- **For any other OpenAI model,** click **[ Add or remove models ]**, then **[ Show OpenAI models ]**. It lists OpenAI's models that can use tools, newest first, with prices. Press **[ Add ]** next to the one you want. The `:batch` variants are left out so each model is listed once; add one by its id if you want it.
+
+**Paying with your own OpenAI API key.** By default OpenAI models spend your OpenRouter credits. To bill your OpenAI account instead, give your OpenAI key to OpenRouter:
+
+1. Create a key at [platform.openai.com/api-keys](https://platform.openai.com/api-keys).
+2. Open [openrouter.ai/settings/integrations](https://openrouter.ai/settings/integrations), find OpenAI, and add the key there.
+3. Keep using Model-Relay as before. OpenRouter now tries your key first for OpenAI models.
+
+Model-Relay never sees or stores your OpenAI key. Three things to know, from [OpenRouter's own page on this](https://openrouter.ai/docs/guides/overview/auth/byok):
+
+- OpenRouter charges a fee for requests made on your own key: 5% of what the model would normally cost on OpenRouter, taken from your OpenRouter credits. Its page describes a monthly allowance before the fee applies; check there for the current terms.
+- If your OpenAI key fails or hits a rate limit, OpenRouter falls back to its own capacity by default and spends your OpenRouter credits. To stop that, set the key's **Shared capacity fallback** to "Never use shared capacity".
+- You still need your OpenRouter key: it is what Claude Code signs in with.
+
 ## Slash commands
 
 | Command | What it does |
@@ -162,6 +184,7 @@ In the same panel, the models you added are listed under **Models you added**, e
 | `/switchfree` | New sessions use OpenRouter's free router |
 | `/switchcoder` | New sessions use Nemotron 3 Ultra (free) |
 | `/switchqwen` | New sessions use Qwen3 Coder (paid) |
+| `/switchgpt` | New sessions use GPT-6.1 Terra, an OpenAI model (paid) |
 | `/switchmodel <id>` | New sessions use any OpenRouter model by its id (checked with OpenRouter first) |
 | `/findmodel <words>` | Search OpenRouter by type or name, such as `/findmodel coding` |
 | `/addmodel <id>` | Add a model to the dropdown. With no id it opens the search box; with words it searches |
@@ -217,6 +240,10 @@ Switch back to Anthropic first (`/switchback`), then uninstall the plugin from `
 
 ## Version history
 
+- **1.1.0** (November 10, 2026): added OpenAI models. GPT-6.1 Terra is in the
+  dropdown with its own `/switchgpt` command, a **[ Show OpenAI models ]**
+  button lists the rest, and the README explains how to pay with your own
+  OpenAI API key through OpenRouter.
 - **1.0.2** (November 9, 2026): rewrote the quick start so it begins with
   getting an OpenRouter key, spelled out that installing takes both
   commands, named the Claude desktop app's Terminal tab as the place to
