@@ -40,8 +40,9 @@ model.
    between Anthropic's Claude models, which needs no key.
 
 2. **Install the plugin.** This takes two commands — **run both, in this
-   order.** Open a **terminal** — not the Claude desktop app's Code tab, which
-   does not run plugin commands — and run:
+   order.** Open the **Claude terminal** — that is the **Terminal** tab in
+   the Claude desktop app, **not** the app's **Code** tab, which does not run
+   plugin commands — and run:
 
    ```
    claude plugin marketplace add j12will12-gmail/model-relay
@@ -71,7 +72,11 @@ model.
    At a Claude Code prompt in a terminal, the same step is
    `/plugin configure model-relay@j12will12-gmail`.
 
-4. **Pick a model** from the dropdown above the prompt, then **start a new session**. A session that's already running keeps the model it started with.
+4. **Open the Claude Code desktop app**, then either **start a new session** or
+   **click an existing session**. Model-Relay appears above the command prompt.
+   **Pick a model** from that dropdown, then start a new session for it to
+   take effect: a session that's already running keeps the model it started
+   with.
 
 ## Contents
 
