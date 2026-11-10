@@ -2,7 +2,7 @@
 
 **Switch Claude Code between Anthropic's Claude models and OpenRouter models from a dropdown, right above the prompt.**
 
-Version 1.0.1 · MIT license · A Claude Code plugin by James Willis
+Version 1.0.2 · MIT license · A Claude Code plugin by James Willis
 
 Model-Relay lets you choose which model your **new** Claude Code sessions use: Anthropic's Claude models on your normal Claude login, or any model on [OpenRouter](https://openrouter.ai), free or paid. Search OpenRouter's catalog by name, model id or type (such as "coding"), add the models you like to the dropdown, and always see which one is active in the status line.
 
@@ -217,6 +217,11 @@ Switch back to Anthropic first (`/switchback`), then uninstall the plugin from `
 
 ## Version history
 
+- **1.0.2** (November 9, 2026): rewrote the quick start so it begins with
+  getting an OpenRouter key, spelled out that installing takes both
+  commands, named the Claude desktop app's Terminal tab as the place to
+  run them, and said where the dropdown appears once the plugin is
+  installed.
 - **1.0.1** (October 29, 2026): corrected the install instructions, which gave
   slash commands that the desktop app's Code tab refuses.
 - **1.0.0** (October 9, 2026): first release.

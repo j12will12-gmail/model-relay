@@ -1,7 +1,7 @@
 {
   "name": "model-relay",
   "displayName": "Model-Relay",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Switch Claude Code between Anthropic's models and OpenRouter models from a dropdown above the prompt, search OpenRouter's catalog by name, id or type (such as coding), and see which model new sessions will use.",
   "author": {
     "name": "James Willis",
