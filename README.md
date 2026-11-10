@@ -83,6 +83,7 @@ model.
 - [What you get](#what-you-get)
 - [Requirements](#requirements)
 - [Using Model-Relay](#using-model-relay)
+- [OpenAI models through OpenRouter](#openai-models-through-openrouter)
 - [Slash commands](#slash-commands)
 - [Examples](#examples)
 - [What it changes, sends and stores](#what-it-changes-sends-and-stores)
@@ -103,7 +104,7 @@ model.
   - GPT-6.1 Terra, a paid OpenAI model (`openai/gpt-6.1-terra`)
   - any OpenRouter models you add
 - **A search box** for OpenRouter's catalog. Search by name, model id, type (such as `coding`), or a mix (such as `free coding`).
-- **A [ Show OpenAI models ] button** that lists OpenAI's current models, ready to add. See [Use OpenAI models](#use-openai-models).
+- **A [ Show OpenAI models ] button** that lists OpenAI's current models, ready to add. See [OpenAI models through OpenRouter](#openai-models-through-openrouter).
 - **The active model in the status line**, for example `Model: Qwen3 Coder (paid)`.
 - **Slash commands** for everything in the dropdown.
 
@@ -156,14 +157,35 @@ While a search runs, **[ Stop ]** ends it. A search also gives up by itself afte
 
 In the same panel, the models you added are listed under **Models you added**, each with a **[ Remove ]** button. **[ Done ]** closes the panel.
 
-### Use OpenAI models
+## OpenAI models through OpenRouter
 
-OpenAI's models are on OpenRouter, so Model-Relay switches to them like any other OpenRouter model, with the OpenRouter key from [Quick start](#quick-start) step 1. Claude Code can't call OpenAI's own API directly, because it speaks a different format, so there is no OpenAI key to give Model-Relay.
+Model-Relay reaches OpenAI's models through OpenRouter. Claude Code can't call OpenAI's own API directly, because it speaks a different format, so there is no OpenAI key to give Model-Relay: the OpenRouter key you already use covers OpenAI's models too.
 
-- **GPT-6.1 Terra** is in the dropdown from the start. Pick it there, or type `/switchgpt`.
-- **For any other OpenAI model,** click **[ Add or remove models ]**, then **[ Show OpenAI models ]**. It lists OpenAI's models that can use tools, newest first, with prices. Press **[ Add ]** next to the one you want. The `:batch` variants are left out so each model is listed once; add one by its id if you want it.
+### Switch to an OpenAI model
 
-**Paying with your own OpenAI API key.** By default OpenAI models spend your OpenRouter credits. To bill your OpenAI account instead, give your OpenAI key to OpenRouter:
+1. **Set up OpenRouter and Model-Relay,** if you haven't yet: [Quick start](#quick-start) steps 1 to 3.
+2. **Make sure you can pay for the model.** At the time of writing none of OpenAI's models is free on OpenRouter. Either add credits at [openrouter.ai/settings/credits](https://openrouter.ai/settings/credits), or [pay with your own OpenAI API key](#pay-with-your-own-openai-api-key).
+3. **Choose the model.**
+   - **GPT-6.1 Terra** is in the dropdown from the start: pick **GPT-6.1 Terra (OpenAI, paid)**, or type `/switchgpt`.
+   - **For any other OpenAI model,** click **[ Add or remove models ]**, then **[ Show OpenAI models ]**. Press **[ Add ]** next to the one you want, then pick it from the dropdown.
+   - **If you know the model's id,** `/switchmodel openai/gpt-6-luna` switches to it in one step.
+4. **Start a new session.** The status line shows the model, for example `Model: GPT-6.1 Terra (OpenAI, paid)`.
+
+**[ Show OpenAI models ]** lists OpenAI's models that can use tools, newest first, with prices:
+
+```
+OpenAI's models on OpenRouter, newest first:
+[ Add ]  OpenAI: GPT-6.1 Terra (paid)  openai/gpt-6.1-terra  $1.00 in / $5.00 out per million tokens
+[ Add ]  OpenAI: GPT-6 Luna (paid)  openai/gpt-6-luna  $0.10 in / $0.50 out per million tokens
+```
+
+The `:batch` variants are left out so each model is listed once; add one by its id if you want it. To see more than the newest ten, search for a name instead, such as `gpt-5`.
+
+To go back to Claude, pick **Anthropic (Claude login)** from the dropdown or type `/switchback`, then start a new session.
+
+### Pay with your own OpenAI API key
+
+By default OpenAI models spend your OpenRouter credits. To bill your OpenAI account instead, give your OpenAI key to OpenRouter:
 
 1. Create a key at [platform.openai.com/api-keys](https://platform.openai.com/api-keys).
 2. Open [openrouter.ai/settings/integrations](https://openrouter.ai/settings/integrations), find OpenAI, and add the key there.
@@ -242,8 +264,8 @@ Switch back to Anthropic first (`/switchback`), then uninstall the plugin from `
 
 - **1.1.0** (November 10, 2026): added OpenAI models. GPT-6.1 Terra is in the
   dropdown with its own `/switchgpt` command, a **[ Show OpenAI models ]**
-  button lists the rest, and the README explains how to pay with your own
-  OpenAI API key through OpenRouter.
+  button lists the rest, and the README explains how to reach OpenAI's models
+  through OpenRouter and how to pay with your own OpenAI API key.
 - **1.0.2** (November 9, 2026): rewrote the quick start so it begins with
   getting an OpenRouter key, spelled out that installing takes both
   commands, named the Claude desktop app's Terminal tab as the place to
